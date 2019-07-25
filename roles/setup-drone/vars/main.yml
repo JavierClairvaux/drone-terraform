@@ -1,0 +1,12 @@
+---
+# vars file for setup-drone
+# drone server variables
+drone_server_version: "1"
+drone_server_name: {% your-drone-server-name %}
+my_client_id: {% your-client-id %}
+my_client_secret: {% your-cliend-secret-type %}
+rpc_secret: {% your-rpc-secret %}
+
+# drone agent variables
+drone_agent_version: 1
+drone_agent_name: {% your-drone-agent-name %}

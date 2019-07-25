@@ -1,0 +1,5 @@
+- name: Deploy Drone instance
+  hosts: drone
+  roles:
+      - install-docker
+      - setup-drone

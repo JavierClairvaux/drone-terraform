@@ -1,0 +1,36 @@
+---
+# tasks file for install-docker
+
+- name: Run yum update
+  command: sudo yum update -y
+  run_once: true
+
+- name: install docker
+  package:
+      name: docker
+      state: present
+  become: yes
+
+- name: Install docker-py
+  pip:
+    name: docker-py
+  sudo: yes
+
+- name: Start docker, if not started
+  service:
+    name: docker
+    state: started
+  sudo: yes
+
+- name: Add ec2 user to docker group
+  user:
+    name: "{{ user }}"
+    groups: "{{ group }}"
+    append: yes
+  sudo: yes
+
+- name: Kill SSH
+  shell: sleep 1; pkill -u {{ user }} sshd
+  async: 3
+  poll: 2
+  run_once: true

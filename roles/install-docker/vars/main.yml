@@ -1,0 +1,3 @@
+#vars for install-docker
+user: {% your-instance-user %}
+group: docker

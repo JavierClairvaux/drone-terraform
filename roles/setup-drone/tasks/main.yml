@@ -1,0 +1,51 @@
+---
+# tasks file for setup-drone
+
+- name: load drone ip
+  include_vars:
+    file: drone_ip.yml
+    #ir: vars/
+
+- name: Pull drone server image
+  docker_image:
+    name: drone/drone:{{ drone_server_version }}
+
+- name: Pull drone agent image
+  docker_image:
+    name: drone/agent:1
+
+- name: create drone-server
+  docker_container:
+     name: "{{ drone_server_name }}"
+     image: drone/drone:{{ drone_agent_version }}
+     state: started
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+       - /var/lib/drone:/data
+     ports:
+       - "80:80"
+       - "443:443"
+     detach: yes
+     restart_policy: always
+     env:
+       DRONE_GITHUB_SERVER=https://github.com
+       DRONE_GITHUB_CLIENT_ID={{ my_client_id }}
+       DRONE_GITHUB_CLIENT_SECRET={{ my_client_secret }}
+       DRONE_AGENTS_ENABLED=true
+       DRONE_RPC_SECRET={{ my_client_secret }}
+       DRONE_SERVER_HOST={{ drone_ip }}
+       DRONE_SERVER_PROTO=http
+
+- name: create drone-agent
+  docker_container:
+     name: "{{ drone_agent_name }}"
+     image: drone/agent:{{ drone_agent_version }}
+     state: started
+     restart_policy: always
+     detach: yes
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+     env:
+       DRONE_RPC_SERVER={{ drone_server_name }}:443
+       DRONE_RPC_SECRET={{ rpc_secret }}
+       DRONE_RUNNER_CAPACITY=2
